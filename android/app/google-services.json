@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "919821628581",
+    "project_id": "list-it-ibohaj-alpha",
+    "storage_bucket": "list-it-ibohaj-alpha.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:919821628581:android:5ac346afd8860c3b18894c",
+        "android_client_info": {
+          "package_name": "com.example.list_it"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlBPyCwwVJe6M4YRXGC6GLcNK8X8z7bCU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
