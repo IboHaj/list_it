@@ -1,7 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:list_it/ChangeNotifiers/client.dart';
 import 'package:list_it/screens/login_page.dart';
+import 'package:list_it/utils/animations.dart';
 import 'package:list_it/utils/extensions.dart';
 import 'package:list_it/utils/shared_preferences.dart';
 import 'package:list_it/widgets/custom_appbar.dart';
@@ -59,7 +59,7 @@ class _MainPageState extends State<MainPage> {
               child: InkWell(
                 onTap: () => client.loggedIn
                     ? client.showAccountDialog(context)
-                    : Navigator.push(context, MaterialPageRoute(builder: (context) => LoginPage())),
+                    : Navigator.push(context, Animations.animatedScreenTransition(LoginPage())),
                 borderRadius: BorderRadius.circular(5),
                 child: Icon(Icons.account_circle, color: context.primaryFixed),
               ),
@@ -85,7 +85,7 @@ class _MainPageState extends State<MainPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
+                          const Text(
                             "Your lists",
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                           ).paddingSymmetric(20, 0),
@@ -114,7 +114,7 @@ class _MainPageState extends State<MainPage> {
                         height: context.height / 5.1,
                         child: client.list.keys.isEmpty
                             ? Center(
-                                child: Text(
+                                child: const Text(
                                   "No available lists currently",
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                                 ),
@@ -219,12 +219,9 @@ class _MainPageState extends State<MainPage> {
   }
 
   Future<void> autoLogin(Client client) async {
-    client.notify(() async => client.userList = await Prefs.loadUserData());
+    client.notify(() async {
+      client.userList = await Prefs.loadUserData();
+      client.loggedIn = true;
+    });
   }
-
-  Future deleteFromDB() async {}
-
-  Future<void> logout(FirebaseAuth auth) async => auth.signOut();
-
-  Future<void> deleteAccount(FirebaseAuth auth) async => auth.currentUser!.delete();
 }

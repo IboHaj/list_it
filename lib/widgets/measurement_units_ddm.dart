@@ -21,7 +21,7 @@ class _MeasurementUnitsDDM extends State<MeasurementUnitsDDM> {
   Widget build(BuildContext context) {
     return DropdownMenu(
       dropdownMenuEntries: measurementUnitsDDM,
-      label: Text("Measurement Units"),
+      label: const Text("Measurement Units"),
       width: context.width / 1.7,
       controller: unitsTEC,
       onSelected: (value) {

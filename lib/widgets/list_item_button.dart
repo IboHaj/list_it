@@ -10,7 +10,19 @@ class ListItemButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
-      onPressed: () async => client.updateOrAddListItem(context),
+      onPressed: () async {
+        if (client.currentSelectedList.isEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                "No list is currently selected, select a list to add an item or create a new list first.",
+              ),
+            ),
+          );
+        } else {
+          client.updateOrAddListItem(context);
+        }
+      },
       tooltip: 'Add shopping item',
       label: const Text("Add shopping item"),
       icon: const Icon(Icons.add),

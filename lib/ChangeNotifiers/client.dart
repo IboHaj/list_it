@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:list_it/screens/login_page.dart';
 import 'package:list_it/utils/auth.dart';
 import 'package:list_it/utils/extensions.dart';
 
@@ -81,7 +82,7 @@ class Client extends ChangeNotifier {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text("Item details", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
+                  const Text("Item details", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
                     decoration: ShapeDecoration(
@@ -197,7 +198,7 @@ class Client extends ChangeNotifier {
               children: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text("Close", style: TextStyle(fontSize: 16)),
+                  child: const Text("Close", style: TextStyle(fontSize: 16)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -254,6 +255,7 @@ class Client extends ChangeNotifier {
                     margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                     padding: EdgeInsets.all(10),
                     child: InkWell(
+                      onTap: () async => updateUserStatus(true, context),
                       child: Center(
                         child: Text(
                           "Sign Out",
@@ -273,6 +275,7 @@ class Client extends ChangeNotifier {
                     margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
                     padding: EdgeInsets.all(10),
                     child: InkWell(
+                      onTap: () async => updateUserStatus(true, context),
                       child: Center(
                         child: Text(
                           "Delete Account",
@@ -312,5 +315,20 @@ class Client extends ChangeNotifier {
     entries.removeWhere((e) => e.title == title);
     editingListItem = false;
     notifyListeners();
+  }
+
+  Future<void> updateUserStatus(bool delete, BuildContext context) async {
+    delete ? await Auth.auth.currentUser?.delete() : await Auth.auth.signOut();
+    Auth.user = null;
+    await Prefs.secureStorage?.delete(key: "User_Email");
+    await Prefs.secureStorage?.delete(key: "User_Password");
+    Prefs.prefs?.remove("Account_Use");
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+            (predicate) => false,
+      );
+    }
   }
 }

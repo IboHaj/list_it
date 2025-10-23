@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:list_it/ChangeNotifiers/client.dart';
 import 'package:list_it/screens/main_page.dart';
 import 'package:list_it/screens/signup_page.dart';
+import 'package:list_it/utils/animations.dart';
 import 'package:list_it/utils/auth.dart';
 import 'package:list_it/utils/connection.dart';
 import 'package:list_it/utils/extensions.dart';
@@ -22,6 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController emailTEC = TextEditingController();
   final TextEditingController passwordTEC = TextEditingController();
   final ValueNotifier<bool> isChecked = ValueNotifier(false);
+  final ValueNotifier<bool> hidePassword = ValueNotifier(true);
 
   bool validateEmail(String? email) {
     RegExp regexp = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
@@ -71,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6),
                       child: Center(
-                        child: Text(
+                        child: const Text(
                           "Welcome to List it! Your one stop for managing various to-do lists and tasks.",
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -102,6 +104,7 @@ class _LoginPageState extends State<LoginPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             TextField(
+                              autocorrect: false,
                               controller: emailTEC,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
@@ -120,25 +123,33 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ).paddingSymmetric(10, 0),
                             SizedBox(height: 10),
-                            TextField(
-                              controller: passwordTEC,
-                              obscureText: true,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(width: 3, color: context.inversePrimary),
+                            ValueListenableBuilder<bool>(
+                              valueListenable: hidePassword,
+                              builder: (context, value, child) => TextField(
+                                autocorrect: false,
+                                controller: passwordTEC,
+                                obscureText: hidePassword.value,
+                                decoration: InputDecoration(
+                                  border: OutlineInputBorder(),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 3, color: context.inversePrimary),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(width: 3, color: context.onPrimaryContainer),
+                                  ),
+                                  labelText: "Password",
+                                  labelStyle: TextStyle(
+                                    color: context.onPrimaryContainer,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  suffixIcon: IconButton(
+                                    onPressed: () => hidePassword.value = !hidePassword.value,
+                                    icon: Icon(hidePassword.value ? Icons.visibility : Icons.visibility_off),
+                                  ),
                                 ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(width: 3, color: context.onPrimaryContainer),
-                                ),
-                                labelText: "Password",
-                                labelStyle: TextStyle(
-                                  color: context.onPrimaryContainer,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ).paddingSymmetric(10, 0),
+                              ).paddingSymmetric(10, 0),
+                            ),
                             Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -172,7 +183,7 @@ class _LoginPageState extends State<LoginPage> {
                                       if (validateEmail(emailTEC.text) && validatePassword(passwordTEC.text)) {
                                         client.notify(() => client.logging = true);
                                         User? user = await Auth.loginUserWithEmailAndPassword(
-                                          emailTEC.text,
+                                          emailTEC.text.toLowerCase(),
                                           passwordTEC.text,
                                           Auth.auth,
                                         );
@@ -192,7 +203,7 @@ class _LoginPageState extends State<LoginPage> {
                                           if (context.mounted) {
                                             await Navigator.pushAndRemoveUntil(
                                               context,
-                                              MaterialPageRoute(builder: (context) => MainPage()),
+                                              Animations.animatedScreenTransition(MainPage()),
                                               (predicate) => false,
                                             );
                                           }
@@ -230,7 +241,7 @@ class _LoginPageState extends State<LoginPage> {
                                     }
                                   },
                                   splashColor: context.inversePrimary,
-                                  child: Text(
+                                  child: const Text(
                                     "Login",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
@@ -256,9 +267,9 @@ class _LoginPageState extends State<LoginPage> {
                                 child: InkWell(
                                   borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
                                   onTap: () =>
-                                      Navigator.push(context, MaterialPageRoute(builder: (context) => SignupPage())),
+                                      Navigator.push(context, Animations.animatedScreenTransition(SignupPage())),
                                   splashColor: context.inversePrimary,
-                                  child: Text(
+                                  child: const Text(
                                     "Sign Up",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
@@ -287,12 +298,12 @@ class _LoginPageState extends State<LoginPage> {
                                     Prefs.prefs?.setBool("Local_Use", true);
                                     Prefs.prefs?.setBool("Account_Use", false);
                                     Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(builder: (context) => MainPage()),
+                                      Animations.animatedScreenTransition(MainPage()),
                                       (predicate) => false,
                                     );
                                   },
                                   splashColor: context.inversePrimary,
-                                  child: Text(
+                                  child: const Text(
                                     "* If you would like to use List it! without an account, click here instead.*",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(

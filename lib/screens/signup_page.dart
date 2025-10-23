@@ -2,6 +2,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:list_it/ChangeNotifiers/client.dart';
 import 'package:list_it/screens/main_page.dart';
+import 'package:list_it/utils/animations.dart';
+import 'package:list_it/utils/auth.dart';
 import 'package:list_it/utils/extensions.dart';
 import 'package:list_it/widgets/custom_appbar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +20,7 @@ class _SignupPageState extends State<SignupPage> {
   final _auth = FirebaseAuth.instance;
   final TextEditingController emailTEC = TextEditingController();
   final TextEditingController passwordTEC = TextEditingController();
+  final ValueNotifier<bool> hidePassword = ValueNotifier(true);
 
   bool validateEmail(String? email) {
     RegExp regexp = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
@@ -81,7 +84,7 @@ class _SignupPageState extends State<SignupPage> {
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                           "Welcome to List it! Your one stop for managing various to-do lists and tasks.",
                           textAlign: TextAlign.center,
                           style: TextStyle(
@@ -114,19 +117,19 @@ class _SignupPageState extends State<SignupPage> {
                             ),
                           ),
                         ).paddingSymmetric(10, 20),
-                      TextField(
+                      ValueListenableBuilder<bool>(
+                        valueListenable: hidePassword,
+                        builder: (context, value, child) => TextField(
+                          autocorrect: false,
                           controller: passwordTEC,
-                          obscureText: true,
+                          obscureText: hidePassword.value,
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                width: 3,
-                                color: context.onSecondaryContainer,
-                              ),
+                              borderSide: BorderSide(width: 3, color: context.inversePrimary),
                             ),
                             focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(width: 3, color: context.onInverseSurface),
+                              borderSide: BorderSide(width: 3, color: context.onPrimaryContainer),
                             ),
                             labelText: "Password",
                             labelStyle: TextStyle(
@@ -134,8 +137,13 @@ class _SignupPageState extends State<SignupPage> {
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                             ),
+                            suffixIcon: IconButton(
+                              onPressed: () => hidePassword.value = !hidePassword.value,
+                              icon: Icon(hidePassword.value ? Icons.visibility : Icons.visibility_off),
+                            ),
                           ),
-                        ).paddingSymmetric(10, 20),
+                        ),
+                      ).paddingSymmetric(10, 20),
                       Container(
                         padding: EdgeInsets.symmetric(vertical: 50),
                         width: context.width / 3.5,
@@ -146,12 +154,12 @@ class _SignupPageState extends State<SignupPage> {
                             onTap: () async {
                               if (validateEmail(emailTEC.text) && validatePassword(passwordTEC.text)) {
                                 client.notify(() => client.logging = true);
-                                User? user = await createUserWithEmailAndPassword(emailTEC.text, passwordTEC.text);
-                                if (user != null && context.mounted) {
+                                Auth.user = await createUserWithEmailAndPassword(emailTEC.text, passwordTEC.text);
+                                if (Auth.user != null && context.mounted) {
                                   client.notify(() => client.logging = false);
                                   Navigator.pushAndRemoveUntil(
                                     context,
-                                    MaterialPageRoute(builder: (context) => MainPage()),
+                                    Animations.animatedScreenTransition(MainPage()),
                                     (predicate) => false,
                                   );
                                 } else if (context.mounted) {
