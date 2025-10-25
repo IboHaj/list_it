@@ -9,6 +9,7 @@ class ListCard extends StatelessWidget {
   final bool editing;
   final Function() editPressed;
   final Function() deletePressed;
+  final bool isSelected;
 
   const ListCard({
     super.key,
@@ -18,6 +19,7 @@ class ListCard extends StatelessWidget {
     required this.editing,
     required this.editPressed,
     required this.deletePressed,
+    this.isSelected = false,
   });
 
   @override
@@ -25,10 +27,11 @@ class ListCard extends StatelessWidget {
     return Stack(
       children: [
         Center(
-          child: Container(
+          child: AnimatedContainer(
+            duration: Duration(milliseconds: 350),
             decoration: ShapeDecoration(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
-              color: context.tertiaryContainer,
+              color: isSelected ? context.tertiary : context.tertiaryContainer,
             ),
             width: double.infinity,
             height: 50,

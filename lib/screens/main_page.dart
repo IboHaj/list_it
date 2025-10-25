@@ -119,32 +119,39 @@ class _MainPageState extends State<MainPage> {
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                                 ),
                               )
-                            : GridView.count(
-                                crossAxisCount: 2,
-                                childAspectRatio: 0.5,
-                                mainAxisSpacing: 5,
-                                crossAxisSpacing: 0,
+                            : GridView.builder(
                                 padding: EdgeInsets.all(5),
                                 primary: true,
                                 scrollDirection: Axis.horizontal,
-                                children: client.list.keys
-                                    .map(
-                                      (e) => ListCard(
-                                        title: e,
-                                        onPressed: () => client.pickedList = e,
-                                        onLongPress: () => client.toggleEditingLists(),
-                                        editing: client.editingList,
-                                        deletePressed: () {
-                                          if (e == client.currentSelectedList) {
-                                            client.pickedList = "";
-                                          }
-                                          client.removeList(e);
-                                        },
-                                        editPressed: () =>
-                                            client.updateOrAddList(context, isEditMode: true, listName: e),
-                                      ),
-                                    )
-                                    .toList(),
+                                itemCount: client.list.keys.length,
+                                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.5,
+                                  mainAxisSpacing: 5,
+                                  crossAxisSpacing: 0,
+                                ),
+                                itemBuilder: (BuildContext context, int index) {
+                                  bool isSelected = client.currentSelectedList == client.list.keys.elementAt(index);
+
+                                  return ListCard(
+                                    title: client.list.keys.elementAt(index),
+                                    onPressed: () => client.pickedList = client.list.keys.elementAt(index),
+                                    onLongPress: () => client.toggleEditingLists(),
+                                    editing: client.editingList,
+                                    deletePressed: () {
+                                      if (client.list.keys.elementAt(index) == client.currentSelectedList) {
+                                        client.pickedList = "";
+                                      }
+                                      client.removeList(client.list.keys.elementAt(index));
+                                    },
+                                    editPressed: () => client.updateOrAddList(
+                                      context,
+                                      isEditMode: true,
+                                      listName: client.list.keys.elementAt(index),
+                                    ),
+                                    isSelected: isSelected,
+                                  );
+                                },
                               ),
                       ),
                     ],
